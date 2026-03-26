@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Fashion Recommender | AI Stylist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --surface: #fafafa;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, .07), 0 2px 4px -2px rgba(0, 0, 0, .07);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, .08), 0 8px 10px -6px rgba(0, 0, 0, .06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(160deg, #f0f4ff 0%, #fdf2f8 50%, #f0fdf4 100%);
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 48px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .input-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+
+        .input-group {
+            margin-bottom: 22px;
+        }
+
+        .input-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .label-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+            color: var(--text);
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .slider-container {
+            flex-grow: 1;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .val-display {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .radio-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 14px;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .radio-container label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background .2s, color .2s;
+        }
+
+        .radio-container label:hover {
+            background: var(--card);
+        }
+
+        .radio-container input:checked+span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .radio-container input {
+            accent-color: var(--primary);
+        }
+
+        .color-select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--card);
+            cursor: pointer;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 48px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .recommendation-header {
+            text-align: center;
+            padding: 28px 24px;
+            border-radius: var(--radius);
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .recommendation-header .result-label {
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 8px 0 6px;
+        }
+
+        .recommendation-header .meta {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 16px;
+            color: var(--text);
+        }
+
+        .category-scores {
+            padding: 20px 24px;
+            background: var(--card);
+            border-radius: var(--radius);
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .category-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .category-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-name {
+            font-weight: 500;
+            min-width: 160px;
+            font-size: 0.9rem;
+        }
+
+        .score-bar-wrap {
+            flex-grow: 1;
+            height: 10px;
+            background: var(--surface);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 6px;
+            transition: width .4s ease;
+        }
+
+        .category-pct {
+            min-width: 48px;
+            text-align: right;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .outfit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .outfit-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .outfit-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .outfit-card img {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+            background: var(--surface);
+        }
+
+        .outfit-meta {
+            padding: 14px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .see-more-wrap {
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .btn-see-more {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+        }
+
+        .btn-see-more:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        #outfits-more {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #outfits-more.visible {
+            display: block;
+        }
+
+        .insight-btn {
+            background: var(--text);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 28px auto;
+            display: block;
+            cursor: pointer;
+            transition: background .2s, transform .1s;
+        }
+
+        .insight-btn:hover {
+            background: #374151;
+            transform: scale(1.02);
+        }
+
+        #insight-section {
+            display: none;
+            margin-top: 28px;
+            padding: 24px;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        #insight-section .insight-grid {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        #insight-section .insight-block {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        #insight-section .insight-block h4 {
+            margin: 0 0 12px;
+            font-size: 1rem;
+        }
+
+        #insight-section .bar-wrap {
+            height: 14px;
+            background: var(--surface);
+            border-radius: 7px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #insight-section .bar-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 7px;
+        }
+
+        #insight-section .graph-wrap {
+            text-align: center;
+        }
+
+        #insight-section .graph-wrap img {
+            max-width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="hero">
+            <h1>Fashion Recommender</h1>
+            <p>Get outfit ideas based on occasion, style, and culture</p>
+        </div>
+
+        <div class="input-card">
+            <form method="POST">
+                <div class="input-group">
+                    <span class="label-text">Occasion</span>
+                    <div class="radio-container">
+                        <label><input type="radio" name="occasion" value="home" {% if result and
+                                result.inputs.occasion=='home' %}checked{% elif not result %}checked{% endif
+                                %}><span>Home</span></label>
+                        <label><input type="radio" name="occasion" value="outing" {% if result and
+                                result.inputs.occasion=='outing' %}checked{% endif %}><span>Outing</span></label>
+                        <label><input type="radio" name="occasion" value="work" {% if result and
+                                result.inputs.occasion=='work' %}checked{% endif %}><span>Work</span></label>
+                        <label><input type="radio" name="occasion" value="party" {% if result and
+                                result.inputs.occasion=='party' %}checked{% endif %}><span>Event</span></label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <span class="label-text">Style preference</span>
+                    <div class="slider-container">
+                        <div class="slider-row">
+                            <input type="range" name="style" min="0" max="10" step="0.1"
+                                value="{{ result.inputs.style if result else 5 }}"
+                                oninput="document.getElementById('s_val').innerText=this.value">
+                            <span class="val-display" id="s_val">{{ result.inputs.style if result else 5 }}</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                            <span>Simple</span><span>Trendy</span><span>Elegant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <span class="label-text">Your age</span>
+                    <div class="slider-container">
+                        <div class="slider-row">
+                            <input type="range" name="age" min="15" max="80"
+                                value="{{ result.inputs.age if result else 25 }}"
+                                oninput="document.getElementById('age_val').innerText=this.value">
+                            <span class="val-display" id="age_val">{{ result.inputs.age if result else 25 }}</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                            <span>15</span>
+                            <span>Young (25 or under)</span>
+                            <span>45+ (Old)</span>
+                            <span>80</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <span class="label-text">Outfit culture</span>
+                    <div class="radio-container">
+                        <label><input type="radio" name="culture" value="traditional" {% if result and
+                                result.inputs.culture=='traditional' %}checked{% endif %}><span>Traditional (e.g.
+                                Burmese)</span></label>
+                        <label><input type="radio" name="culture" value="western" {% if result and
+                                result.inputs.culture=='western' %}checked{% elif not result %}checked{% endif
+                                %}><span>Western</span></label>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn-primary">Recommend outfit</button>
+                </div>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="recommendation-header">
+            <div
+                style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">
+                Recommendation</div>
+            <div class="result-label">{{ result.label | upper }}</div>
+            <div class="meta">Outfits: {{ result.age_culture_label }}</div>
+        </div>
+
+        <div class="section-title">Style match by category</div>
+        <div class="category-scores">
+            {% for item in result.category_scores %}
+            <div class="category-row">
+                <span class="category-name">{{ item.label }}</span>
+                <div class="score-bar-wrap">
+                    <div class="score-bar" style="width: {{ item.pct }}%;"></div>
+                </div>
+                <span class="category-pct">{{ item.pct }}%</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="section-title">Outfit suggestions</div>
+        <div class="outfit-grid">
+            {% for outfit in result.outfits %}
+            <div class="outfit-card">
+                <img src="{{ url_for('static', filename='images/' + outfit.img) }}?v={{ range(1, 9999) | random }}"
+                    alt="{{ outfit.desc }}" onerror="this.style.background='#e5e7eb'; this.alt='Image not found';">
+                <div class="outfit-meta">{{ outfit.desc }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="see-more-wrap">
+            <button type="button" class="btn-see-more" onclick="toggleSeeMore()">See more</button>
+        </div>
+        <div id="outfits-more" class="outfit-grid">
+            {% for outfit in result.outfits_more %}
+            <div class="outfit-card">
+                <img src="{{ url_for('static', filename='images/' + outfit.img) }}?v={{ range(1, 9999) | random }}"
+                    alt="{{ outfit.desc }}" onerror="this.style.background='#e5e7eb'; this.alt='Image not found';">
+                <div class="outfit-meta">{{ outfit.desc }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="insight-btn" onclick="toggleInsights()">View insights</button>
+
+        <div id="insight-section">
+            <div class="insight-grid">
+                <div class="insight-block">
+                    <h4>Match strength</h4>
+                    <div class="bar-wrap">
+                        <div class="bar-fill" style="width: {{ result.confidence }}%;"></div>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">{{ result.confidence }}% — how
+                        well the top category fits your choices.</p>
+                </div>
+                <div class="insight-block graph-wrap">
+                    <h4>Fuzzy output</h4>
+                    <img src="{{ url_for('static', filename='images/' + result.graph) }}?v={{ range(1, 9999) | random }}"
+                        alt="Fuzzy graph" style="max-width: 480px;">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleSeeMore() {
+            var el = document.getElementById("outfits-more");
+            var btn = document.querySelector(".btn-see-more");
+            if (el.classList.contains("visible")) {
+                el.classList.remove("visible");
+                btn.textContent = "See more";
+            } else {
+                el.classList.add("visible");
+                btn.textContent = "See less";
+            }
+        }
+        function toggleInsights() {
+            var x = document.getElementById("insight-section");
+            x.style.display = x.style.display === "block" ? "none" : "block";
+        }
+    </script>
+</body>
+
+</html>
